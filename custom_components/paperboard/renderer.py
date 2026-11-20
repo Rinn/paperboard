@@ -201,7 +201,7 @@ class ScreenRenderer:
                         home_name=self.hass.config.location_name or "")
 
     def _render_templates(self) -> dict[str, str]:
-        """HA Jinja for text slots, in the loop; a broken template shows its error briefly."""
+        """Template widgets' HA Jinja, in the loop; a broken template shows its error briefly."""
         out = {}
         for source in self.active_layout(dt_util.now()).templates:
             try:

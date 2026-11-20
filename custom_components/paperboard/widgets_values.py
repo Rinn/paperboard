@@ -30,8 +30,8 @@ def kilowatts(value: float | None, unit: str) -> float | None:
 
 def kv_list(svg: Svg, r: Rect, rows: list[tuple[str, str]], measure: Measurer, theme: Theme,
             row_h: float = 21, dotted: bool = True) -> float:
-    """Label left, value right-aligned; returns the height used. Rows past r are dropped.
-    row_h is in design pixels (800x480) and scales with the theme."""
+    """Label left, value right-aligned; returns the height used. Rows past r are dropped; a
+    value wider than r is cut. row_h is in design pixels (800x480) and scales with the theme."""
     p = theme.px
     row_h = p(row_h)
     label, value = theme.text("s"), theme.text("s", bold=True)
@@ -40,6 +40,7 @@ def kv_list(svg: Svg, r: Rect, rows: list[tuple[str, str]], measure: Measurer, t
         if y + row_h > r.y + r.h + p(2):
             break
         base = y + row_h - p(6)
+        v = measure.truncate(v, value, r.w)
         vw = measure.width(v, value)
         svg.text(r.x, base, measure.truncate(k, label, r.w - vw - p(8)), label)
         svg.text(r.x + r.w, base, v, value, "end")
@@ -158,4 +159,15 @@ def rooms(svg: Svg, r: Rect, snap: Snapshot, measure: Measurer, theme: Theme,
         chunk = rows[c * per:(c + 1) * per]
         kv_list(svg, Rect(r.x + c * (cw + gap), y, cw, r.h - (y - r.y)), chunk, measure, theme,
                 row_h=19)
+    return True
+
+
+def values_rows(svg: Svg, r: Rect, snap: Snapshot, measure: Measurer, theme: Theme,
+                rows: list[tuple[str, str]]) -> bool:
+    """Label left, template value right; an empty value shows an em dash, all empty collapses."""
+    texts = [" ".join(snap.texts.get(template, "").split()) for _label, template in rows]
+    if not any(texts):
+        return False
+    kv_list(svg, r, [(label, text or fmt.MISSING)
+                     for (label, _template), text in zip(rows, texts, strict=True)], measure, theme)
     return True

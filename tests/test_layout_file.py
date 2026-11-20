@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from custom_components.paperboard import layout_file
+from custom_components.paperboard import compose, layout_file
 from custom_components.paperboard.layout_file import changed, load_all, parse
 
 GOOD = """
@@ -59,3 +59,12 @@ def test_user_dir_wins_and_bad_file_keeps_last_good(tmp_path: Path,
     second = load_all(user, previous=first)
     assert second.layouts["demo"] is first.layouts["demo"]  # last good kept
     assert any("widgets[1].type" in m for m in second.errors[str(user / "demo.yaml")])
+
+
+def test_values_templates_are_collected() -> None:
+    spec = parse("name: x\ngrid: {columns: [fr], rows: [fr], areas: [a]}\nwidgets:\n"
+                 "  - {type: text, area: a, options: {template: '{{ a }}'}}\n"
+                 "  - {type: values, area: a, options:"
+                 " {rows: [{label: B, template: '{{ b }}'}, {label: C}, nonsense]}}\n"
+                 "  - {type: values, area: a, options: {rows: 5}}\n", "x")
+    assert compose.as_layout(spec).templates == ("{{ a }}", "{{ b }}")

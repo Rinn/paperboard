@@ -105,7 +105,7 @@ The device redraws only when the picture changed, which saves flashes and batter
 - **Layouts:** put `*.yaml` files in `/config/paperboard/`. They are picked up within 30 s; a
   broken file shows a Repairs issue and the last working version keeps rendering.
   - Format: [docs/design/layout-schema.md](docs/design/layout-schema.md). It has a CSS-like
-    grid with named areas, 18 widget types, rules, boxes and black tiles.
+    grid with named areas, 19 widget types, rules, boxes and black tiles.
 - **Schedules:** a schedule file switches layouts by time of day and condition. For example,
   *Tavlan* from 07:00 to 08:00 on school days, and a quiet night layout that wakes the device
   once an hour. See [Schedules](docs/design/layout-schema.md#schedules-sprint-03-t-06) and

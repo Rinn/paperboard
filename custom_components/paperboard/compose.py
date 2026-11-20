@@ -167,6 +167,10 @@ def as_layout(spec: LayoutSpec, theme_for: Callable[[], Theme] | None = None) ->
 
     templates = tuple(w["options"]["template"] for w in spec.widgets
                       if w["type"] == "text" and isinstance(w["options"].get("template"), str))
+    templates += tuple(row["template"] for w in spec.widgets
+                       if w["type"] == "values" and isinstance(w["options"].get("rows"), list)
+                       for row in w["options"]["rows"]
+                       if isinstance(row, dict) and isinstance(row.get("template"), str))
     return Layout(build=build, clock_resolution=spec.clock_resolution, templates=templates)
 
 

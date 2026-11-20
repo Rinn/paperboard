@@ -19,8 +19,8 @@ from .schema import format_errors, vol
 
 BUNDLED_DIR = Path(__file__).parent / "layouts_yaml"
 WIDGET_TYPES = ("header", "now", "timeline", "hourly_table", "daily", "energy", "energy_flow",
-                "rooms", "stat", "sun_moon", "agenda", "text", "footer", "hourly_strip",
-                "tomorrow", "date", "week", "now_grid")
+                "rooms", "stat", "sun_moon", "agenda", "text", "values", "footer",
+                "hourly_strip", "tomorrow", "date", "week", "now_grid")
 COLLAPSE = ("left", "right", "up", "down", "none")
 FRAMES = ("none", "box", "rounded", "inverted", "panel")
 

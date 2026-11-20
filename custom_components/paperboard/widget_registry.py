@@ -22,7 +22,7 @@ from .widgets_flow import energy_flow
 from .widgets_series import axis_labels, night_shading, now_marker, price_chart, solar_chart
 from .widgets_sky import sun_moon
 from .widgets_text import text_slot
-from .widgets_values import energy, kv_list, role_value, room_name, rooms, stat
+from .widgets_values import energy, kv_list, role_value, room_name, rooms, stat, values_rows
 from .widgets_weather import _weather_attrs, daily, hourly_strip, hourly_table, tomorrow_at
 
 
@@ -329,6 +329,16 @@ def _text(svg: Svg, r: Rect, snap: Snapshot, m: Measurer, t: Theme, o: dict) -> 
     return text_slot(svg, r, snap, m, t, o.get("template"), o.get("auto"),
                      str(o.get("size", "m")), bool(o.get("bold", True)),
                      int(o.get("max_lines", 3)))
+
+
+@widget("values")
+def _values(svg: Svg, r: Rect, snap: Snapshot, m: Measurer, t: Theme, o: dict) -> bool:
+    rows = []
+    for row in o.get("rows") if isinstance(o.get("rows"), list) else []:
+        if isinstance(row, dict):
+            rows.append((str(layout_text(row.get("label"), snap.lang) or ""),
+                         str(row.get("template", ""))))
+    return values_rows(svg, r, snap, m, t, rows)
 
 
 @widget("hourly_strip")

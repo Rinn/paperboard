@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- A `values` widget: `rows: [{label, template}]`, label left and the template's value right, as
+  in the energy widget. Your own layouts can now show any entity in rows, not only the roles'
+  entities.
+
 ## [0.2.2] - 2026-11-21
 
 ### Changed

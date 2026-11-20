@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import custom_components.paperboard.widget_registry  # noqa: F401
+from custom_components.paperboard.compose import REGISTRY
 from custom_components.paperboard.data import SolarSnapshot
 from custom_components.paperboard.fonts import FONT_DIR, load_fonts
 from custom_components.paperboard.layouts import Snapshot
@@ -14,7 +16,7 @@ from custom_components.paperboard.style import Theme
 from custom_components.paperboard.svg import Svg
 from custom_components.paperboard.text import Measurer
 from custom_components.paperboard.widgets import Rect
-from custom_components.paperboard.widgets_values import energy, energy_rows, stat
+from custom_components.paperboard.widgets_values import energy, energy_rows, stat, values_rows
 
 TZ = ZoneInfo("Europe/Stockholm")
 NOW = dt.datetime(2026, 11, 8, 12, 15, tzinfo=TZ)
@@ -57,3 +59,30 @@ def test_energy_and_stat_golden() -> None:
     assert stat(svg, Rect(240, 20, 200, 80), _snap(roles), m, t, "outdoor_temp", "Ute")
     assert stat(svg, Rect(460, 20, 200, 80), _snap(ROLES), m, t, "outdoor_temp", "Ute") is False
     assert_golden("energy_and_stat", render(str(svg), PanelProfile(), FONT_DIR).png)
+
+
+def test_values_rows_golden() -> None:
+    from tests.golden_util import assert_golden
+
+    snap = Snapshot(lang="en", now=NOW, width=800, height=480, screen_name="x",
+                    texts={"{{ temperature }}": "21.5°", "{{ blank }}": "  ",
+                           "{{ humidity }}": "48 %",
+                           "{{ broken( }}": "⚠ TemplateSyntaxError: unexpected end of template, "
+                                            "expected ')'."})
+    svg, m, t = Svg(800, 480), Measurer(load_fonts()), Theme()
+    rows = [("Temperature", "{{ temperature }}"), ("Blank", "{{ blank }}"),
+            ("Humidity", "{{ humidity }}"), ("Not rendered", "{{ missing }}"),
+            ("Broken", "{{ broken( }}")]
+    assert values_rows(svg, Rect(20, 20, 260, 140), snap, m, t, rows)
+    assert values_rows(svg, Rect(320, 20, 260, 140), snap, m, t,
+                       [("Blank", "{{ blank }}"), ("Not rendered", "{{ missing }}")]) is False
+    assert_golden("values_rows", render(str(svg), PanelProfile(), FONT_DIR).png)
+
+
+def test_values_empty_label() -> None:
+    snap = Snapshot(lang="en", now=NOW, width=800, height=480, screen_name="x",
+                    texts={"{{ humidity }}": "48 %"})
+    svg = Svg(800, 480)
+    assert REGISTRY["values"](svg, Rect(20, 20, 260, 40), snap, Measurer(load_fonts()), Theme(),
+                              {"rows": [{"label": None, "template": "{{ humidity }}"}]})
+    assert "None" not in str(svg)

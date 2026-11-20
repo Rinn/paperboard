@@ -50,7 +50,7 @@ class Layout:
     clock_resolution: int = 300  # seconds; how often the visible clock may change the image
     # Optional: pick entities from all entity ids at start (zero-config layouts).
     discover: Callable[[list[str]], tuple[str, ...]] | None = None
-    # HA Jinja templates used by text slots; rendered in the event loop per snapshot.
+    # HA Jinja templates used by text and values widgets; rendered in the event loop per snapshot.
     templates: tuple[str, ...] = ()
     schedule: Any = None  # schedule.ScheduleSpec when this layout is a time-of-day schedule
 
